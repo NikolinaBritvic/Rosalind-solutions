@@ -1,4 +1,4 @@
-
+# Compute the Number of Times a Pattern Appears in a Text
 def kmer(text, i, k):
     return text[i : (i + k)]
 
