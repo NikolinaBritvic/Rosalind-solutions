@@ -1,27 +1,36 @@
-from collections import defaultdict
+from itertools import product
 
-def neighbour(pattern, mismatch, words):
-    bases = ['A', 'T', 'G', 'C']
-    for i in range(len(pattern)):
-        for j in range(len(bases)):
-            new_pattern = pattern[:i] + bases[j] + pattern[i+1:]
-            if mismatch <= 1:
-                words.add(new_pattern)
-            else:
-                neighbour(new_pattern, mismatch - 1, words)
-def FindMostFrequentWords(text, k, d):
-    AllFrequentWords = defaultdict(int)
-    for i in range(len(text) - k + 1):
-        FrequentWords = set()
-        neighbour(text[i:i + k], d, FrequentWords)
-        for words in FrequentWords:
-            AllFrequentWords[words] += 1
-    # print AllFrequentWords
-    for t in AllFrequentWords.keys():
-        if AllFrequentWords[t] == max(AllFrequentWords.values()):
-            print(t, end=" ")
+def HammingDistance(a,b):
+    br=0
+    for i in range(len(a)):
+        if a[i]!=b[i]:
+            br+=1
+    return br
+
+def kmeri(k):
+    kmers=["".join(c) for c in product("ACGT",repeat=k)]
+    return kmers
+
+def Metoda(text,k,d):
+    lista={}
+    kmers=kmeri(k)
+    
+    for kmer in kmers:
+        for i in range(len(text)-k+1):
+            if HammingDistance(text[i:i+k],kmer)<=d:
+                if kmer not in lista:
+                    lista[kmer]=1
+                else:
+                    lista[kmer]+=1
+    
+    max_=max(lista.values())
+    result=[]
+    for name,value in lista.items():
+        if value==max_:
+            result.append(name)
+    return result
 
 text=input("Unesi text: ")
 k=int(input("Unesi k: "))
 d=int(input("Unesi d: "))
-print(FindMostFrequentWords(text,k,d))
+print(Metoda(text,k,d))
