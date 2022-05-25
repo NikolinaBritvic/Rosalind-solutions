@@ -1,24 +1,25 @@
 # Computing a Frequency Array
-
 from itertools import product
 
 def allKmers(k):
     return [''.join(i) for i in product('ACGT', repeat = k)]
+    
+def Metoda(text,k):
+    kmeri=allKmers(k)
+    arr=[0]*len(kmeri)   
+    for i in range(len(kmeri)):
+        br=0 
+        for j in range(len(text)-k+1):
+            if text[j:j+k]==kmeri[i]:
+                br+=1
+            arr[i]=br
+    s=""
+    for i in range(len(arr)):
+        s+=str(arr[i])+" "
+    return s
+        
 
-def countKmer(dna, kmer):
-    count = 0
-    for i in range(len(dna) - len(kmer) + 1):
-        if dna[i : i + len(kmer)] == kmer:
-            count += 1
-    return(count)
+text=input("Text: ")
+k=int(input("k: "))
+print(Metoda(text,k))
 
-def FrequencyArray(text,k):
-    kmers = allKmers(k)
-    freq = [0] * len(kmers)
-    for i in range(len(kmers)):
-        freq[i] = countKmer(text, kmers[i])
-    return ' '.join([str(x) for x in freq])
-
-text=input("Unesi text: ")
-k=int(input("Unesi k: "))
-print(FrequencyArray(text,k))
