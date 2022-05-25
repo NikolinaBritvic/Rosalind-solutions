@@ -1,90 +1,49 @@
 # Frequent Words with Mismatches and Reverse Complements Problem
 
-def suffix(pattern):
-    #substring of pattern without first letter
-    return pattern[1:]
+from itertools import product
 
-def HammingDistance(p, q):
-    """Computes the hamming distance between strings p and q"""
-    if len(p) != len(q):
-        return -1
+def HammingDistance(a,b):
+    br=0
+    for i in range(len(a)):
+        if a[i]!=b[i]:
+            br+=1
+    return br
 
-    dist = 0
-    #zip(AB,CD) gives (('A','C'),('B','D'))
-    for first, second in zip(p, q):
-        if first != second:
-            dist = dist + 1
+def ReverseComplement(a):
+    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A'}
+    return ''.join([complement[base] for base in a[::-1]])
 
-    return dist
+def kmeri(k):
+    kmers=["".join(c) for c in product("ACGT",repeat=k)]
+    return kmers
 
-def Neighbors(pattern,d):
-    nucleotides={'A','C','G','T'}
-    if d==0:
-        return {pattern}
-    if len(pattern)==1:
-        return nucleotides
-    neighborhood=set()
-    suffixNeighbors=Neighbors(suffix(pattern),d)
-    for x in suffixNeighbors:
-        if (HammingDistance(suffix(pattern),x)<d):
-            for n in nucleotides:
-                neighborhood.add(n+x)
-        else:
-            neighborhood.add(pattern[0]+x)
-    return neighborhood
+def Metoda(text,k,d):
+    lista={}
+    kmers=kmeri(k)
+    
+    for kmer in kmers:
+        for i in range(len(text)-k+1):
+            if HammingDistance(text[i:i+k],kmer)<=d:
+                if kmer not in lista:
+                    lista[kmer]=1
+                else:
+                    lista[kmer]+=1
+            if HammingDistance(text[i:i+k],ReverseComplement(kmer))<=d:
+                if kmer not in lista:
+                    lista[kmer]=1
+                else:
+                    lista[kmer]+=1
+    
+    max_=max(lista.values())
+    result=[]
+    for name,value in lista.items():
+        if value==max_:
+            result.append(name)
+    return result
 
-def kmer(text, i, k):
-    """substring of text from i-th position for the next k letters"""
-    return text[i:(i+k)]
-
-def complement(text):
-    """complement of text"""
-    compl=""
-    nt = len(text)
-    for i in range (0,nt):
-        if text[i]=="G":
-            compl=compl+"C"
-        if text[i]=="C":
-            compl=compl+"G"
-        if text[i]=="A":
-            compl=compl+"T"
-        if text[i]=="T":
-            compl=compl+"A"
-    return compl
-
-def reverse(text):
-    """reverse of text"""
-    return text[::-1]
-
-
-def FindingFrequentWordsWithMismatchesAndReverseComplementBySorting(Text, k, d):
-    FrequentPatterns=[]
-    Neighborhoods=[]
-    for i in range(0,len(Text)-k+1):
-        Neighborhoods.append(Neighbors(kmer(Text,i,k),d))
-    NeighborhoodDict=dict()
-    for hood in Neighborhoods:
-        for n in hood:
-            if n in NeighborhoodDict.keys():
-                NeighborhoodDict[n]+=1
-            else:
-                NeighborhoodDict[n]=1
-
-    NeighborhoodDictNew=NeighborhoodDict.copy()
-    for key in NeighborhoodDict.keys():
-        if reverse(complement(key)) in NeighborhoodDict.keys():
-            NeighborhoodDictNew[key]+=NeighborhoodDict[reverse(complement(key))]
-
-    maxCount=max(NeighborhoodDictNew.values())
-    for key in NeighborhoodDictNew:
-        if NeighborhoodDictNew[key]==maxCount:
-            FrequentPatterns.append(key)
-    return FrequentPatterns
-
-text=input("Unesi text: ")
-k=int(input("Unesi k: "))
-d=int(input("Unesi d: "))
-res=FindingFrequentWordsWithMismatchesAndReverseComplementBySorting(text,k,d)
-print(" ".join(res))
+text=input("Text: ")
+k=int(input("k: "))
+d=int(input("d: "))
+print(Metoda(text,k,d))
 
 
