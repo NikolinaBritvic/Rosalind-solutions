@@ -1,4 +1,4 @@
-#
+#  Translate an RNA String into an Amino Acid String
 
 def ProteinTranslation(unos):
     genetic_code = {
